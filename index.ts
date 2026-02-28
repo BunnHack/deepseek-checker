@@ -14,6 +14,20 @@ export default {
 
   // HTTP 進入點 (讓你可以手動打開網址測試)
   async fetch(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
+    const url = new URL(request.url);
+    
+    // 【方案二測試開關】：如果網址後面加上 ?test=true，就直接發送測試推播
+    if (url.searchParams.get("test") === "true") {
+      await sendDiscordNotification(
+        "Old-Test-Build-123", 
+        "New-Test-Build-456", 
+        "這是一條測試訊息！如果你看到這段話，代表 Discord Webhook 串接完全成功囉 🚀", 
+        env
+      );
+      return new Response("✅ 測試通知已成功發送至 Discord！請檢查你的頻道。");
+    }
+
+    // 正常的執行邏輯 (手動觸發監控)
     await checkTask(env);
     return new Response("✅ 監控任務執行完畢！請查看 Discord 或 KV 狀態。");
   },
@@ -73,7 +87,7 @@ async function checkTask(env: Env) {
  */
 async function fetchPageData(targetUrl: string) {
   const res = await fetch(targetUrl, {
-    headers: { 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) MonitorBot/1.0' }
+    headers: { 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 MonitorBot/1.0' }
   });
   if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
   const html = await res.text();
@@ -99,6 +113,7 @@ async function fetchJsContents(targetUrl: string, scriptPaths: string[]): Promis
       try {
         const res = await fetch(`${origin}${path}`);
         const content = await res.text();
+        // 將 page-f771e2c1298902e1.js 轉成 page.js
         const baseName = path.replace(/-[a-f0-9]{16,}\.js$/, '.js');
         files[baseName] = content;
       } catch (e) {
@@ -163,7 +178,7 @@ ${diffText}`;
         "Authorization": `Bearer ${env.LLM_API_KEY}`,
       },
       body: JSON.stringify({
-        model: "deepseek-chat", // 根據你的 API 供應商填寫模型名稱 (如 gpt-4o-mini)
+        model: "deepseek-chat", // 根據你的 API 供應商填寫模型名稱 (如 gpt-4o-mini 或 deepseek-chat)
         messages: [{ role: "user", content: prompt }],
         temperature: 0.3,
       }),
