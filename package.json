@@ -1,0 +1,9 @@
+{
+  "name": "deepseek-monitor",
+  "version": "1.0.0",
+  "private": true,
+  "devDependencies": {
+    "typescript": "^5.0.0",
+    "@cloudflare/workers-types": "^4.20240222.0"
+  }
+}
