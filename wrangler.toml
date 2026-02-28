@@ -1,4 +1,4 @@
-name = "deepseek-monitor"
+name = "deepseek-checker"
 main = "index.ts"
 compatibility_date = "2024-02-28"
 
