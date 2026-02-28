@@ -1,0 +1,12 @@
+name = "deepseek-monitor"
+main = "index.ts"
+compatibility_date = "2024-02-28"
+
+# 設定每分鐘觸發一次
+[triggers]
+crons = ["* * * * *"]
+
+# 記得在 Cloudflare 後台建立 KV 後，把 ID 補上
+[[kv_namespaces]]
+binding = "MONITOR_KV"
+id = "你的_KV_ID_填在這裡"
